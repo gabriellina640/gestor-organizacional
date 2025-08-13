@@ -15,13 +15,12 @@ class Task extends Model
         'urgency',
         'estimated_hours',
         'status',
+        'user_id', // adicionado
     ];
 
-    /**
-     * Relacionamento: tarefa pode ter vários usuários (atribuição).
-     */
-    public function users()
+    // Relacionamento com usuário
+    public function user()
     {
-        return $this->belongsToMany(User::class)->withTimestamps();
+        return $this->belongsTo(User::class);
     }
 }

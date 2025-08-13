@@ -22,4 +22,18 @@ class Organization extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    // app/Models/Organization.php
+
+public function tasks()
+{
+    return $this->hasMany(Task::class);
 }
+
+public function meetings()
+{
+    return $this->hasMany(Meeting::class);
+}
+
+}
+
