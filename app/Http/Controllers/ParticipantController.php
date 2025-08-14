@@ -21,13 +21,12 @@ class ParticipantController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:participants,email',
+            'name'  => 'required|string|max:255',
+            'cargo' => 'nullable|string|max:255'
         ]);
 
-        Participant::create($request->all());
-
-        return redirect()->route('participants.index')->with('success', 'Participante adicionado!');
+        Participant::create($request->only('name', 'cargo'));
+        return redirect()->route('participants.index')->with('success', 'Participante cadastrado com sucesso!');
     }
 
     public function edit(Participant $participant)
@@ -38,18 +37,17 @@ class ParticipantController extends Controller
     public function update(Request $request, Participant $participant)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:participants,email,' . $participant->id,
+            'name'  => 'required|string|max:255',
+            'cargo' => 'nullable|string|max:255'
         ]);
 
-        $participant->update($request->all());
-
-        return redirect()->route('participants.index')->with('success', 'Participante atualizado!');
+        $participant->update($request->only('name', 'cargo'));
+        return redirect()->route('participants.index')->with('success', 'Participante atualizado com sucesso!');
     }
 
     public function destroy(Participant $participant)
     {
         $participant->delete();
-        return redirect()->route('participants.index')->with('success', 'Participante removido!');
+        return redirect()->route('participants.index')->with('success', 'Participante excluído com sucesso!');
     }
 }

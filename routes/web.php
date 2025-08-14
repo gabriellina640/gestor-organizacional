@@ -1,12 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\OrganizationController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\MeetingController;
-use App\Http\Controllers\ParticipantController;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReuniaoController; 
+use App\Http\Controllers\ParticipantController;
 /*
 |--------------------------------------------------------------------------
 | Rotas de autenticação
@@ -31,23 +29,43 @@ Route::get('/', function () {
 */
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard inicial do usuário
-    Route::get('/dashboard', [OrganizationController::class, 'dashboard'])
-        ->name('dashboard');
+ 
 
-    // Organização
-    Route::get('/organization/create', [OrganizationController::class, 'create'])->name('organization.create');
-    Route::post('/organization', [OrganizationController::class, 'store'])->name('organization.store');
-    Route::get('/organization/{organization}/edit', [OrganizationController::class, 'edit'])->name('organization.edit');
-    Route::put('/organization/{organization}', [OrganizationController::class, 'update'])->name('organization.update');
-
-    // Tarefas
-    Route::resource('tasks', TaskController::class);
-
-    // Reuniões
-    Route::resource('meetings', MeetingController::class);
-    Route::post('meetings/{meeting}/checkin/{user}', [MeetingController::class, 'checkIn'])->name('meetings.checkin');
-
-    // Participantes
-    Route::resource('participants', ParticipantController::class);
 });
+// Dashboard inicial
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    Route::get('/sprints', function () {
+        return "Página de Sprint";
+    })->name('sprints.index');
+
+    Route::get('/participants/create', function () {
+        return "Página de Cadastrar Integrantes";
+    })->name('participants.create');
+});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
+Route::get('/reunioes', [ReuniaoController::class, 'index'])->name('reunioes.index');
+// routes/web.php
+
+
+Route::get('/reunioes', [ReuniaoController::class, 'index'])->name('reunioes.index');
+Route::post('/reunioes', [ReuniaoController::class, 'store'])->name('reunioes.store');
+Route::post('/reunioes/{id}/concluir', [ReuniaoController::class, 'concluir'])->name('reunioes.concluir');
+
+Route::get('/reunioes/{id}/edit', [ReuniaoController::class, 'edit'])->name('reunioes.edit');
+Route::put('/reunioes/{id}', [ReuniaoController::class, 'update'])->name('reunioes.update');
+
+Route::delete('/reunioes/limpar', [ReuniaoController::class, 'limparConcluidas'])->name('reunioes.limpar');
+
+Route::resource('participants', ParticipantController::class)->middleware('auth');

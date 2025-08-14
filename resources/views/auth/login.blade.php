@@ -2,11 +2,17 @@
 
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-blue-100">
+    
     <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">Organiza Ai</h2>
+        <h2 class="text-3xl font-bold text-center text-blue-600 mb-6"></h2>
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
+          <div class="flex flex-col items-center mb-6">
+       <img src="{{ asset('images/slogan.png') }}" 
+         alt="Organiza Ai" 
+         style="height: 300px; width: auto;">
+         </div>
 
             <!-- Email -->
             <div class="mb-4">
