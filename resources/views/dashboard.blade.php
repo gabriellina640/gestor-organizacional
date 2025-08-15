@@ -41,36 +41,28 @@
         </a>
     </div>
 
-    <!-- Modal de cadastro de participante -->
+    <!-- Formulário de cadastro de participante -->
     <div x-show="openModal" 
-         class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" 
+         @click.away="openModal = false"
+         class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
+         x-transition
          x-cloak>
-        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+         
+        <div class="bg-gray-50 p-4 rounded shadow relative w-full max-w-md">
+            <!-- Botão de fechar -->
+            <div class="flex justify-end">
+                <button @click="openModal = false" 
+                        class="text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+            </div>
+
             <h2 class="text-xl font-bold mb-4">Cadastrar Participante</h2>
 
-            <form method="POST" action="{{ route('participants.store') }}">
+            <form method="POST" action="{{ route('participants.store') }}" class="flex flex-col gap-4 mt-2">
                 @csrf
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-bold mb-2">Nome</label>
-                    <input type="text" name="nome" class="w-full border rounded p-2" required>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-bold mb-2">Cargo (opcional)</label>
-                    <input type="text" name="cargo" class="w-full border rounded p-2">
-                </div>
-
-                <div class="flex justify-end gap-2">
-                    <button type="button" 
-                            @click="openModal = false" 
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-                        Cancelar
-                    </button>
-                    <button type="submit" 
-                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-                        Salvar
-                    </button>
-                </div>
+                <input type="text" name="name" placeholder="Nome" class="border rounded p-2 w-full" required>
+                <input type="text" name="cargo" placeholder="Cargo (opcional)" class="border rounded p-2 w-full">
+                
+                <button type="submit" class="btn-preto">Salvar</button>
             </form>
         </div>
     </div>

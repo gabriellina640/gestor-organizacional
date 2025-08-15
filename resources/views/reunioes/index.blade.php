@@ -3,95 +3,46 @@
 @section('content')
 
 <style>
-    /* Botões */
-    .btn-preto {
-        background-color: #000;
-        color: #fff;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        transition: filter 0.2s;
-        text-align: center;
-        font-weight: 500;
-    }
-    .btn-preto:hover {
-        filter: brightness(90%);
-    }
+/* Botões */
+.btn-preto { background-color: #000; color: #fff; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: filter 0.2s; font-weight: 500; cursor: pointer; }
+.btn-preto:hover { filter: brightness(90%); }
 
-    .btn-verde {
-        background-color: #16a34a;
-        color: #fff;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        transition: filter 0.2s;
-        text-align: center;
-        font-weight: 500;
-    }
-    .btn-verde:hover {
-        filter: brightness(90%);
-    }
+.btn-verde { background-color: #16a34a; color: #fff; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: filter 0.2s; font-weight: 500; cursor: pointer; }
+.btn-verde:hover { filter: brightness(90%); }
 
-    .btn-vermelho {
-        background-color: #dc2626;
-        color: #fff;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        transition: filter 0.2s;
-        text-align: center;
-        font-weight: 500;
-    }
-    .btn-vermelho:hover {
-        filter: brightness(90%);
-    }
+.btn-vermelho { background-color: #dc2626; color: #fff; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: filter 0.2s; font-weight: 500; cursor: pointer; }
+.btn-vermelho:hover { filter: brightness(90%); }
 
-    /* Reunião card */
-    .reuniao-card {
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        background-color: #ffffff;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-
-    .reuniao-info {
-        margin-bottom: 0.5rem;
-    }
-
-    .reuniao-info span {
-        display: block;
-        color: #374151;
-        font-size: 0.95rem;
-    }
-
-    .reuniao-titulo {
-        font-weight: 600;
-        font-size: 1.1rem;
-        margin-bottom: 0.3rem;
-        color: #111827;
-    }
-
-    .reuniao-botoes {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-
-    /* Layout responsivo */
-    @media (max-width: 768px) {
-        .reuniao-botoes {
-            flex-direction: column;
-        }
-    }
+/* Reunião card */
+.reuniao-card { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.reuniao-info { margin-bottom: 0.5rem; }
+.reuniao-info span { display: block; color: #374151; font-size: 0.95rem; }
+.reuniao-titulo { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.3rem; color: #111827; }
+.reuniao-botoes { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+@media (max-width: 768px) { .reuniao-botoes { flex-direction: column; } }
 </style>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ openForm: false, editReuniao: null }">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{
+    openForm: false,
+    openCheckIn: false,
+    editReuniao: { id: '', titulo: '', local: '', data: '', hora: '', descricao: '' },
+    checkInReuniao: { id: '', participants: [] },
+    abrirForm(reuniao = null) {
+        if(reuniao) this.editReuniao = reuniao;
+        else this.editReuniao = { id: '', titulo: '', local: '', data: '', hora: '', descricao: '' };
+        this.openForm = true;
+        $nextTick(() => { document.querySelector('input[name=titulo]').focus(); });
+    },
+    abrirCheckIn(reuniaoId, participants) {
+        this.checkInReuniao.id = reuniaoId;
+        this.checkInReuniao.participants = participants || [];
+        this.openCheckIn = true;
+    }
+}">
 
-    <!-- Cabeçalho -->
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Minhas Reuniões</h1>
-        <button @click="openForm = !openForm; editReuniao = null" class="btn-preto">
-            Agendar Reunião
-        </button>
+        <button @click="abrirForm()" class="btn-preto">Agendar Reunião</button>
     </div>
 
     <!-- Formulário -->
@@ -100,27 +51,44 @@
             <button @click="openForm = false" class="text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
         </div>
 
-        <form :action="editReuniao ? '/reunioes/' + editReuniao.id : '{{ route('reunioes.store') }}'" method="POST" class="flex flex-col gap-4 mt-2">
+        <form :action="editReuniao.id ? '/reunioes/' + editReuniao.id : '{{ route('reunioes.store') }}'" method="POST" class="flex flex-col gap-4 mt-2">
             @csrf
-            <template x-if="editReuniao">
-                @method('PUT')
+            <template x-if="editReuniao.id">
+                <input type="hidden" name="_method" value="PUT">
             </template>
 
-            <input type="text" name="titulo" placeholder="Título" class="border rounded p-2 w-full" required
-                   x-bind:value="editReuniao ? editReuniao.titulo : ''">
-            <input type="text" name="local" placeholder="Local" class="border rounded p-2 w-full" required
-                   x-bind:value="editReuniao ? editReuniao.local : ''">
-            <input type="date" name="data" class="border rounded p-2 w-full" required
-                   x-bind:value="editReuniao ? editReuniao.data : ''">
-            <input type="time" name="hora" class="border rounded p-2 w-full" required
-                   x-bind:value="editReuniao ? editReuniao.hora : ''">
-            <textarea name="descricao" placeholder="Descrição" class="border rounded p-2 w-full" required x-text="editReuniao ? editReuniao.descricao : ''"></textarea>
+            <input type="text" name="titulo" placeholder="Título" class="border rounded p-2 w-full" required x-bind:value="editReuniao.titulo">
+            <input type="text" name="local" placeholder="Local" class="border rounded p-2 w-full" required x-bind:value="editReuniao.local">
+            <input type="date" name="data" class="border rounded p-2 w-full" required x-bind:value="editReuniao.data">
+            <input type="time" name="hora" class="border rounded p-2 w-full" required x-bind:value="editReuniao.hora">
+            <textarea name="descricao" placeholder="Descrição" class="border rounded p-2 w-full" required x-text="editReuniao.descricao"></textarea>
 
             <button type="submit" class="btn-preto">Salvar</button>
         </form>
     </div>
 
-    <!-- Conteúdo das reuniões -->
+    <!-- Modal de Check-in -->
+    <div x-show="openCheckIn" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" x-transition>
+        <div class="bg-white p-6 rounded shadow-lg w-full max-w-md" @click.away="openCheckIn = false">
+            <h3 class="text-lg font-bold mb-4">Marcar Presença</h3>
+
+            <form :action="'/reunioes/' + checkInReuniao.id + '/concluir'" method="POST" class="flex flex-col gap-2">
+                @csrf
+                <template x-for="user in checkInReuniao.participants" :key="user.id">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" :name="'presenca['+user.id+']'" x-bind:value="user.id">
+                        <span x-text="user.nome || user.name"></span>
+                    </label>
+                </template>
+
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" @click="openCheckIn = false" class="btn-vermelho">Cancelar</button>
+                    <button type="submit" class="btn-verde">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="flex gap-6 flex-col md:flex-row">
 
         <!-- Reuniões Agendadas -->
@@ -134,11 +102,27 @@
                         <div class="reuniao-info"><strong>Data:</strong> <span>{{ $reuniao->data }} {{ $reuniao->hora }}</span></div>
                         <div class="reuniao-info"><strong>Descrição:</strong> <span>{{ $reuniao->descricao }}</span></div>
                         <div class="reuniao-botoes">
-                            <button @click.prevent="openForm = true; editReuniao = {{ json_encode($reuniao) }}" class="btn-preto">Editar</button>
-                            <form action="{{ route('reunioes.concluir', $reuniao->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn-verde">Concluir</button>
-                            </form>
+
+                            <!-- Botão Editar -->
+                            <button 
+                                @click.prevent="abrirForm({
+                                    id: '{{ $reuniao->id }}',
+                                    titulo: '{{ addslashes($reuniao->titulo) }}',
+                                    local: '{{ addslashes($reuniao->local) }}',
+                                    data: '{{ $reuniao->data }}',
+                                    hora: '{{ $reuniao->hora }}',
+                                    descricao: '{{ addslashes($reuniao->descricao) }}'
+                                })" 
+                                class="btn-preto">
+                                Editar
+                            </button>
+
+                            <!-- Botão Concluir -->
+                            <button 
+                                @click.prevent="abrirCheckIn({{ $reuniao->id }}, {{ $participants->toJson() }})"
+                                class="btn-verde">
+                                Concluir
+                            </button>
                         </div>
                     </div>
                 @endforeach
@@ -151,14 +135,12 @@
         <div class="flex-1">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Reuniões Concluídas</h2>
-                @if($reunioesConcluidas->count() > 0)
-                    <form action="{{ route('reunioes.limpar') }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn-vermelho">Limpar</button>
-                    </form>
-                @endif
+                <form action="{{ route('reunioes.limparConcluidas') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-vermelho text-sm">Limpar</button>
+                </form>
             </div>
+
             @if($reunioesConcluidas->count() > 0)
                 @foreach($reunioesConcluidas as $reuniao)
                     <div class="reuniao-card">
@@ -174,6 +156,7 @@
         </div>
 
     </div>
+
 </div>
 
 @endsection

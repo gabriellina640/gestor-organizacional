@@ -69,3 +69,13 @@ Route::put('/reunioes/{id}', [ReuniaoController::class, 'update'])->name('reunio
 Route::delete('/reunioes/limpar', [ReuniaoController::class, 'limparConcluidas'])->name('reunioes.limpar');
 
 Route::resource('participants', ParticipantController::class)->middleware('auth');
+Route::resource('reunioes', ReuniaoController::class);
+// ou explicitamente
+Route::post('reunioes', [ReuniaoController::class, 'store'])->name('reunioes.store');
+Route::put('reunioes/{id}', [ReuniaoController::class, 'update'])->name('reunioes.update');
+
+Route::resource('reunioes', ReuniaoController::class);
+
+Route::put('/reunioes/{id}', [ReuniaoController::class, 'update'])->name('reunioes.update');
+Route::post('/reunioes/limpar-concluidas', [ReuniaoController::class, 'limparConcluidas'])
+    ->name('reunioes.limparConcluidas');
