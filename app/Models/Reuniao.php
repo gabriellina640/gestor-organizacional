@@ -9,7 +9,7 @@ class Reuniao extends Model
 {
     use HasFactory;
 
-    protected $table = 'reunioes'; // nome da tabela
+    protected $table = 'reunioes';
 
     protected $fillable = [
         'titulo',
@@ -32,12 +32,12 @@ class Reuniao extends Model
     public function participantes()
     {
         return $this->belongsToMany(
-            Participant::class,      // Modelo relacionado
-            'participant_reuniao',   // Nome da tabela pivot
-            'reuniao_id',            // FK desta tabela na pivot
-            'participant_id'         // FK do modelo relacionado na pivot
+            Participant::class,       // Modelo relacionado
+            'participant_reuniao',    // Nome da tabela pivot
+            'reuniao_id',             // Chave estrangeira desta tabela na pivot
+            'participant_id'          // Chave estrangeira do modelo relacionado
         )
-        ->withPivot('presente')     // se você quer pegar campo "presente" da pivot
-        ->withTimestamps();         // se a pivot tiver created_at/updated_at
+        ->withPivot('presente')       // Campo extra na pivot
+        ->withTimestamps();           // Se a pivot tiver created_at/updated_at
     }
 }

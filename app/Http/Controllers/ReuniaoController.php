@@ -4,25 +4,32 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Reuniao;
+use App\Models\Participant;
 
 class ReuniaoController extends Controller
 {
     // Lista reuniões agendadas e concluídas
     public function index()
-{
-    // Carrega reuniões agendadas
-    $reunioesAgendadas = Reuniao::where('status', 'agendada')->get();
+    {
+        // Reuniões agendadas com participantes
+        $reunioesAgendadas = Reuniao::where('status', 'agendada')
+            ->with('participantes')
+            ->get();
 
-    // Carrega reuniões concluídas
-    $reunioesConcluidas = Reuniao::where('status', 'concluida')->get();
+        // Reuniões concluídas com participantes que marcaram presença
+        $reunioesConcluidas = Reuniao::where('status', 'concluida')
+            ->with(['participantes' => function ($query) {
+                $query->wherePivot('presente', true); // apenas quem esteve presente
+            }])
+            ->get();
 
-    // Carrega todos os participantes da tabela participants
-    $participants = \App\Models\Participant::all();
+        // Todos os participantes disponíveis
+        $participants = Participant::all();
 
-    return view('reunioes.index', compact('reunioesAgendadas', 'reunioesConcluidas', 'participants'));
-}
+        return view('reunioes.index', compact('reunioesAgendadas', 'reunioesConcluidas', 'participants'));
+    }
 
-    // Salva uma nova reunião
+    // Cria nova reunião
     public function store(Request $request)
     {
         $request->validate([
@@ -42,7 +49,7 @@ class ReuniaoController extends Controller
             'status' => 'agendada',
         ]);
 
-        // Se quiser já adicionar participantes ao criar:
+        // Adiciona participantes, se enviados
         if ($request->has('participantes')) {
             $reuniao->participantes()->sync($request->participantes);
         }
@@ -50,25 +57,34 @@ class ReuniaoController extends Controller
         return redirect()->route('reunioes.index')->with('success', 'Reunião criada com sucesso!');
     }
 
-    // Marca reunião como concluída
+    // Marca reunião como concluída e salva presença
     public function concluir(Request $request, $id)
     {
         $reuniao = Reuniao::findOrFail($id);
+
+        // Atualiza status da reunião
         $reuniao->status = 'concluida';
         $reuniao->save();
 
-        // Salvar presenças, se for necessário
-        // $reuniao->participantes()->sync($request->input('presenca', []));
+        // Atualiza presenças na tabela pivot
+        if ($request->has('presenca')) {
+            foreach ($request->presenca as $participantId => $presente) {
+                // Atualiza cada participante na pivot
+                $reuniao->participantes()->updateExistingPivot($participantId, ['presente' => $presente]);
+            }
+        }
 
-        return redirect()->back()->with('success', 'Reunião concluída!');
+        return redirect()->back()->with('success', 'Reunião concluída e presenças registradas!');
     }
 
+    // Edita reunião
     public function edit($id)
     {
         $reuniao = Reuniao::with('participantes')->findOrFail($id);
         return view('reunioes.create', compact('reuniao'));
     }
 
+    // Atualiza reunião
     public function update(Request $request, $id)
     {
         $reuniao = Reuniao::findOrFail($id);
@@ -82,7 +98,7 @@ class ReuniaoController extends Controller
             'status' => $reuniao->status,
         ]);
 
-        // Atualiza participantes, se enviados
+        // Atualiza participantes
         if ($request->has('participantes')) {
             $reuniao->participantes()->sync($request->participantes);
         }
@@ -90,6 +106,7 @@ class ReuniaoController extends Controller
         return redirect()->route('reunioes.index')->with('success', 'Reunião atualizada!');
     }
 
+    // Limpa reuniões concluídas
     public function limparConcluidas()
     {
         Reuniao::where('status', 'concluida')->delete();

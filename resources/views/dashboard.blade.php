@@ -34,7 +34,7 @@
         </a>
 
         <!-- Banner Sprint -->
-        <a href="{{ route('sprints.index') }}" 
+        <a href="{{ route('tarefas.index') }}" 
            style="flex: 0 0 400px; height: 400px; position: relative; overflow: hidden; border-radius: 0.5rem;">
             <img src="{{ asset('images/tarefas.png') }}" 
                  style="width: 100%; height: 100%; object-fit: cover;" alt="Sprint">

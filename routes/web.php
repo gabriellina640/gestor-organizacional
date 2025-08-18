@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReuniaoController; 
 use App\Http\Controllers\ParticipantController;
+  use App\Http\Controllers\TarefaController;
 /*
 |--------------------------------------------------------------------------
 | Rotas de autenticação
@@ -42,10 +43,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+Route::get('/sprints', function () {
+    return view('tarefas.index');
+})->name('tarefas.index');
 
-    Route::get('/sprints', function () {
-        return "Página de Sprint";
-    })->name('sprints.index');
 
     Route::get('/participants/create', function () {
         return "Página de Cadastrar Integrantes";
@@ -79,3 +80,12 @@ Route::resource('reunioes', ReuniaoController::class);
 Route::put('/reunioes/{id}', [ReuniaoController::class, 'update'])->name('reunioes.update');
 Route::post('/reunioes/limpar-concluidas', [ReuniaoController::class, 'limparConcluidas'])
     ->name('reunioes.limparConcluidas');
+
+  
+
+// Rota para exibir a página de tarefas
+Route::get('/sprints', [TarefaController::class, 'index'])->name('tarefas.index');
+
+// Rota para salvar nova tarefa
+Route::post('/tarefas', [TarefaController::class, 'store'])->name('tarefas.store');
+Route::put('/tarefas/{tarefa}/status', [TarefaController::class, 'updateStatus'])->name('tarefas.updateStatus');

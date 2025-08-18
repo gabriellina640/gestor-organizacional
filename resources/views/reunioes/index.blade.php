@@ -76,7 +76,7 @@
                 @csrf
                 <template x-for="user in checkInReuniao.participants" :key="user.id">
                     <label class="flex items-center gap-2">
-                        <input type="checkbox" :name="'presenca['+user.id+']'" x-bind:value="user.id">
+                        <input type="checkbox" :name="'presenca['+user.id+']'" value="1" x-bind:checked="user.presente">
                         <span x-text="user.nome || user.name"></span>
                     </label>
                 </template>
@@ -148,6 +148,18 @@
                         <div class="reuniao-info"><strong>Local:</strong> <span>{{ $reuniao->local }}</span></div>
                         <div class="reuniao-info"><strong>Data:</strong> <span>{{ $reuniao->data }} {{ $reuniao->hora }}</span></div>
                         <div class="reuniao-info"><strong>Descrição:</strong> <span>{{ $reuniao->descricao }}</span></div>
+
+                        <!-- Lista de Participantes Presentes -->
+                        <div class="reuniao-info">
+                            <strong>Participantes Presentes:</strong>
+                            <ul>
+                                @foreach($reuniao->participantes as $p)
+                                    @if($p->pivot->presente)
+                                        <li>{{ $p->nome }}</li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 @endforeach
             @else
