@@ -10,7 +10,7 @@ return new class extends Migration
 {
     Schema::create('participants', function (Blueprint $table) {
         $table->id();
-        $table->string('nome');
+        $table->string('name');
         $table->string('cargo')->nullable();
         $table->timestamps();
     });

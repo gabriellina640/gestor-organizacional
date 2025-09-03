@@ -151,7 +151,7 @@
 
                         <!-- Lista de Participantes Presentes -->
                         <div class="reuniao-info">
-                            <strong>Participantes Presentes:</strong>
+                            <strong></strong>
                             <ul>
                                 @foreach($reuniao->participantes as $p)
                                     @if($p->pivot->presente)
